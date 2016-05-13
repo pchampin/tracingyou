@@ -1,0 +1,199 @@
+{
+  "traceUri": "https://ktbs.pe.gatech.edu/pilot/test/test/",
+  "postDelay": 2000,
+  "helpUrl": "http://example.org/help.html",
+  "rulesets": {
+    "": [
+      {
+        "event": "change",
+        "selector": "#tracingyou-gui input",
+        "force": true,
+        "template": {
+          "@type": "m:ToggleTracing",
+          "begin": "{time}",
+          "m:tabId": "{tabId}",
+          "m:url": "{url}",
+          "m:tracing": "{@target.checked}"
+        }
+      },
+
+      {
+        "event": "tracingyou-configured",
+        "template": {
+          "@type": "m:VisitPage",
+          "begin": "{time}",
+          "m:tabId": "{tabId}",
+          "m:url": "{url}"
+        }
+      },
+      {
+        "event": "blur",
+        "template": {
+          "@type": "m:BlurPage",
+          "begin": "{time}",
+          "m:tabId": "{tabId}",
+          "m:url": "{url}",
+          "m:target": "{selector}"
+        }
+      },
+      {
+        "event": "focus",
+        "template": {
+          "@type": "m:FocusPage",
+          "begin": "{time}",
+          "m:tabId": "{tabId}",
+          "m:url": "{url}"
+        }
+      },
+      {
+        "event": "visibilitychange",
+        "template": {
+          "@type": "m:ChangePageVisibility",
+          "begin": "{time}",
+          "m:tabId": "{tabId}",
+          "m:url": "{url}",
+          "m:hidden": "{@target.hidden}"
+        }
+      },
+
+
+      {
+        "event": "click",
+        "filter": "a",
+        "template": {
+          "@type": "m:ClickLink",
+          "begin": "{time}",
+          "m:tabId": "{tabId}",
+          "m:url": "{url}",
+          "m:target": "{selector}",
+          "m:textContent": "{@target.textContent}",
+          "m:href": "{@target.href}"
+        }
+      },
+
+
+
+      {
+        "event": "change",
+        "filter": "input, textarea, select",
+        "template": {
+          "@type": "m:ChangeFormElement",
+          "begin": "{time}",
+          "m:tabId": "{tabId}",
+          "m:url": "{url}",
+          "m:target": "{selector}",
+          "m:label": "{label}"
+        }
+      },
+      {
+        "event": "click",
+        "filter": "button, input[type=submit], input[type=button], input[type=reset]",
+        "template": {
+          "@type": "m:ClickButton",
+          "begin": "{time}",
+          "m:tabId": "{tabId}",
+          "m:url": "{url}",
+          "m:target": "{selector}",
+          "m:label": "{label}"
+        }
+      },
+      {
+        "event": "submit",
+        "selector": "form",
+        "template": {
+          "@type": "m:SubmitForm",
+          "begin": "{time}",
+          "m:tabId": "{tabId}",
+          "m:url": "{url}",
+          "m:target": "{selector}",
+          "m:action": "{@target.action}"
+        }
+      },
+
+
+      {
+        "event": "play",
+        "selector": "video, audio",
+        "template": {
+          "@type": "m:PlayMedia",
+          "begin": "{time}",
+          "m:tabId": "{tabId}",
+          "m:url": "{url}",
+          "m:target": "{selector}",
+          "m:src": "{@target.currentSrc}",
+          "m:duration": "{@target.duration}",
+          "m:currentTime": "{@target.currentTime}",
+          "m:volume": "{@target.volume}",
+          "m:muted": "{@target.muted}",
+          "m:autoplay": "{@target.autoplay}"
+        }
+      },
+      {
+        "event": "pause",
+        "selector": "video, audio",
+        "template": {
+          "@type": "m:PauseMedia",
+          "begin": "{time}",
+          "m:tabId": "{tabId}",
+          "m:url": "{url}",
+          "m:target": "{selector}",
+          "m:src": "{@target.currentSrc}",
+          "m:duration": "{@target.duration}",
+          "m:currentTime": "{@target.currentTime}",
+          "m:volume": "{@target.volume}",
+          "m:muted": "{@target.muted}"
+        }
+      },
+      {
+        "event": "seeked",
+        "selector": "video, audio",
+        "template": {
+          "@type": "m:SeekMedia",
+          "begin": "{time}",
+          "m:tabId": "{tabId}",
+          "m:url": "{url}",
+          "m:target": "{selector}",
+          "m:src": "{@target.currentSrc}",
+          "m:duration": "{@target.duration}",
+          "m:currentTime": "{@target.currentTime}",
+          "m:volume": "{@target.volume}",
+          "m:muted": "{@target.muted}"
+        }
+      },
+      {
+        "event": "ended",
+        "selector": "video, audio",
+        "template": {
+          "@type": "m:MediaEnded",
+          "begin": "{time}",
+          "m:tabId": "{tabId}",
+          "m:url": "{url}",
+          "m:target": "{selector}",
+          "m:src": "{@target.currentSrc}",
+          "m:duration": "{@target.duration}",
+          "m:currentTime": "{@target.currentTime}",
+          "m:volume": "{@target.volume}",
+          "m:muted": "{@target.muted}"
+        }
+      }
+    ],
+
+
+
+    "test2.html": [
+      {
+        "event": "mouseover",
+        "filter": "a",
+        "template": {
+          "@type": "m:MouseOver",
+          "begin": "{time}",
+          "m:tabId": "{tabId}",
+          "m:url": "{url}",
+          "m:target": "{selector}",
+          "m:textContent": "{@target.textContent}",
+          "m:href": "{@target.href}"
+        }
+      }
+    ]
+  }
+}

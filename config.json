@@ -1,5 +1,5 @@
-{
-  "traceUri": "https://ktbs.pe.gatech.edu/pilot/test/test/",
+*{
+  "traceUri": "HERE THE URL OF YOUR KTBS",
   "postDelay": 2000,
   "helpUrl": "http://example.org/help.html",
   "rulesets": {

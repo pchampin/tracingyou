@@ -74,6 +74,10 @@ function sendObsels() {
     obselXhr.setRequestHeader('content-type', 'application/json');
     obselXhr.onerror = function () {
         console.error("error posting obsels: no response");
+        setTimeout(function () {
+            obselXhr = null;
+            if (obselQueue.length) sendObsels();
+        }, config.postDelay*5 || 5000);
     };
     obselXhr.onload = function () {
         //console.log('obselXhr.onload', obselXhr);

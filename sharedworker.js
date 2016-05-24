@@ -45,7 +45,11 @@ function sendConfig(url) {
             rules = rules.concat(rulesets[regex]);
         }
     }
-    port.postMessage({ helpUrl: helpUrl, rules: rules });
+    port.postMessage({
+        helpUrl: helpUrl,
+        defaultContext: config.defaultContext,
+        rules: rules
+    });
 }
 
 /**

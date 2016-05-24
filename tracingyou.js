@@ -8,6 +8,7 @@
     var scriptUrl = new Error().stack.match(/(https?:\/\/.+):\d+:\d+/)[1];
     var PREVENT_SHARED_WORKER = false;
     var loaded = false;
+    var defaultContext = undefined;
     var rules; // set by workerHandlerMessage
 
     var port = connectToWorker();
@@ -93,6 +94,7 @@
             help.href = evt.data.helpUrl;
             help.target = '_blank';
             gui.appendChild(help);
+            defaultContext = evt.data.defaultContext;
             rules = evt.data.rules || [];
             if (loaded) {
                 makeAllListenersForRules();
@@ -179,6 +181,10 @@
                     }
                 );
                 var obsel = JSON.parse(json);
+                if (obsel['@context'] === undefined
+                    && defaultContext !== undefined) {
+                    obsel['@context'] = defaultContext;
+                }
                 console.log("Sending obsel to worker", obsel);
                 port.postMessage(obsel);
             }

@@ -16,6 +16,7 @@ The structure of ``config.json`` is as follow:
 * ``traceUri``: the URI of the trace to POST obsels to (required)
 * ``postDelay``: how many ms between each POST (defaults to 1000)
 * ``helpUrl``: the URL of the help page for the collector(defaults to a generic help page)
+* ``defaultContext``: a JSON-LD context object to be added (as ``@context``) to any obsel having none
 * ``rulesets``: an object whose attributes are regexp, and values are arrays of rules (see below).
 
 Each ruleset will be applied to all URLs matching the regex.
@@ -89,6 +90,7 @@ Here are the messages that the script and the worker can exchange:
   containing:
 
   + ``helpUrl`` from ``config.json``
+  + ``defaultContext`` from ``config.json``
   + ``rules`` contains an array of rules (see above) that apply to that page
 
   The script adds the ``helpUrl`` in its GUI,

@@ -4,16 +4,18 @@
 "use strict";
 var scriptUrl = new Error().stack.match(/(https?:\/\/.+):\d+:\d+/)[1];
 
+var port = null;
+
 console.log("shared worker started", scriptUrl);
 
 onconnect = function(evt) {
-    var port = evt.ports[0];
+    port = evt.ports[0];
     port.addEventListener('message', function(evt) {
         var msg = evt.data;
         //console.log("message reveived", msg);
         if (typeof(msg) === 'string') {
             whenConfigReady(function() {
-                sendConfig(msg, port);
+                sendConfig(msg);
             });
         } else {
             enqueueObsel(msg);
@@ -31,10 +33,9 @@ onerror = function(msg, filename, linenumber) {
  * Send the configuration for the given url to the given port.
  * Assumes that config has been correctly loaded.
  * @param url
- * @param port
  */
-function sendConfig(url, port) {
-    //console.log("sendConfig", url, port);
+function sendConfig(url) {
+    //console.log("sendConfig", url);
     var helpUrl = config.helpUrl || "#help"; // TODO provide a generic help URL
     var rules = [];
     var rulesets = config.rulesets || {};
@@ -58,6 +59,23 @@ function enqueueObsel(obsel) {
         whenConfigReady(sendObsels);
     }
 }
+
+var recordingError = false;
+
+function setRecordingError(on) {
+    if (!on) {
+        // send it regardless of recordingError,
+        // as the user may have tried to turn it on again
+        port.postMessage({ record: false });
+        recordingError = true;
+    } else if (recordingError && on) {
+        // only reset once after an error,
+        // we do not want to start recording when the *user* stopped it
+        port.postMessage({ record: true });
+        recordingError = false;
+    }
+}
+
 var obselQueue = [];
 var obselXhr = null;
 
@@ -74,17 +92,18 @@ function sendObsels() {
     obselXhr.setRequestHeader('content-type', 'application/json');
     obselXhr.onerror = function () {
         console.error("error posting obsels: no response");
-        setTimeout(function () {
-            obselXhr = null;
-            if (obselQueue.length) sendObsels();
-        }, config.postDelay*5 || 5000);
+        setRecordingError(false);
+        obselXhr = null;
     };
     obselXhr.onload = function () {
         //console.log('obselXhr.onload', obselXhr);
+        var delay;
         if (obselXhr.status !== 201) {
             console.error("error posting obsels:", obselXhr.status,
                 obselXhr.statusText, obselXhr.responseText);
-        } //else console.log('POST request succeeded');
+            setRecordingError(false);
+            obselXhr = null;
+        } else  //console.log('POST request succeeded');
         setTimeout(function () {
             obselXhr = null;
             if (obselQueue.length) sendObsels();

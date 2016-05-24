@@ -85,17 +85,23 @@
     function workerMessageHandler(evt) {
         //console.log('workerMessageHandler', evt.data, evt);
 
-        // add link to help
-        var help = document.createElement('a');
-        help.textContent = '?';
-        help.href = evt.data.helpUrl;
-        help.target = '_blank';
-        gui.appendChild(help);
-        rules = evt.data.rules || [];
-        if (loaded) {
-            makeAllListenersForRules();
+        if (evt.data.rules !== undefined) {
+            // This is the first message from the worker.
+            // add link to help
+            var help = document.createElement('a');
+            help.textContent = '?';
+            help.href = evt.data.helpUrl;
+            help.target = '_blank';
+            gui.appendChild(help);
+            rules = evt.data.rules || [];
+            if (loaded) {
+                makeAllListenersForRules();
+            } else {
+                window.addEventListener('load', makeAllListenersForRules)
+            }
         } else {
-            window.addEventListener('load', makeAllListenersForRules)
+            // This is a further message from the worker.
+            gui.querySelector('input').checked = evt.data.record;
         }
     }
 

@@ -80,7 +80,7 @@ and allow them to temporarily\ [#disabling-tracing]_ disable tracing
 It also creates a worker (a shared worker if supported by the browser)
 to handle AJAX queries (configuration reading and communication with kTBS).
 
-Here are the messages that the script can exchange with the worker:
+Here are the messages that the script and the worker can exchange:
 
 * When the script is loaded,
   it first sends the URL of the page (as a string) to the worker;
@@ -94,11 +94,11 @@ Here are the messages that the script can exchange with the worker:
   The script adds the ``helpUrl`` in its GUI,
   and creates an event listener corresponding to each rule.
 
-* Any other message sent by the script is interpreted as an obsel,
+* Any other message sent by the script to the worker is interpreted as an obsel,
   which will be sent to the configured trace.
 
-  Apart from the rules set in ``config.json``,
-  ``tracingyou.js`` will generate an obsel on the loading of the page where it is included.
+* The worker may also send further messages to turn the recording off,
+  to indicate a problem with the server.
 
 
 .. [#disabling-tracing] it uses sessionStorage,

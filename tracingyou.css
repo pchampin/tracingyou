@@ -26,7 +26,7 @@
     display: inline-block;
     width: 2em;
     height: 2em;
-    border-radius: 50%;
+    border-radius: 0;
     background: gray;
     color: rgba(100%,100%,100%,0);
 
@@ -34,7 +34,7 @@
     text-align: center;
     font-family: sans-serif;
 
-    transition: color 0.9s;
+    transition: color 0.9s, border-radius 0.5s ;
 }
 
 #tracingyou-gui:hover a {
@@ -43,6 +43,7 @@
 
 #tracingyou-gui input:checked + a {
     background: red;
+    border-radius: 50%;
 }
 
 

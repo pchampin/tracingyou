@@ -155,15 +155,13 @@
                                 value = labels[0].textContent;
                             } else if (target.placeholder) {
                                 value = target.placeholder;
-                            } else if (target.tagName == 'BUTTON') {
-                                value = target.textContent;
                             } else if (target.tagName == 'SELECT') {
                                 value = target.children[0].textContent;
                             } else if (target.tagName == 'INPUT' &&
                                 target.type.match(/submit|reset|button/)) {
                                 value = target.value;
                             } else {
-                                value = null;
+                                value = target.textContent;
                             }
                         }
                         else if (key[0] === '@') {

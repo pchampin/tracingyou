@@ -218,7 +218,7 @@
 
         var tagName = element.tagName;
         if (element.id) {
-            selector = '#' + element.id;
+            selector = tagName.toLowerCase() + '#' + element.id;
         }
         else if (tagName == "BODY" || tagName == "HEAD") {
             selector = tagName.toLowerCase();

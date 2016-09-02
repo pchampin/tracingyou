@@ -1,4 +1,4 @@
-*{
+{
   "traceUri": "HERE THE URL OF YOUR KTBS",
   "postDelay": 2000,
   "helpUrl": "http://example.org/help.html",
@@ -32,8 +32,7 @@
           "@type": "m:BlurPage",
           "begin": "{time}",
           "m:tabId": "{tabId}",
-          "m:url": "{url}",
-          "m:target": "{selector}"
+          "m:url": "{url}"
         }
       },
       {
@@ -56,18 +55,29 @@
         }
       },
 
+      {
+        "event": "scroll",
+        "throttle": 250,
+        "template": {
+          "@type": "m:Scroll",
+          "begin": "{time}",
+          "m:tabId": "{tabId}",
+          "m:url": "{url}"
+        }
+      },
+
 
       {
         "event": "click",
-        "filter": "a",
         "template": {
-          "@type": "m:ClickLink",
+          "@type": "m:Click",
           "begin": "{time}",
           "m:tabId": "{tabId}",
           "m:url": "{url}",
           "m:target": "{selector}",
-          "m:textContent": "{@target.textContent}",
-          "m:href": "{@target.href}"
+          "m:label": "{label}",
+          "m:href": "{@target.href}",
+          "m:src": "{@target.src}"
         }
       },
 
@@ -78,18 +88,6 @@
         "filter": "input, textarea, select",
         "template": {
           "@type": "m:ChangeFormElement",
-          "begin": "{time}",
-          "m:tabId": "{tabId}",
-          "m:url": "{url}",
-          "m:target": "{selector}",
-          "m:label": "{label}"
-        }
-      },
-      {
-        "event": "click",
-        "filter": "button, input[type=submit], input[type=button], input[type=reset]",
-        "template": {
-          "@type": "m:ClickButton",
           "begin": "{time}",
           "m:tabId": "{tabId}",
           "m:url": "{url}",

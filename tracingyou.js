@@ -21,6 +21,7 @@
         sessionStorage.setItem('tabId', tabId);
     }
     console.log("tabId", tabId);
+    var throttle = {};
 
     window.addEventListener('load', function() {
         document.body.appendChild(gui);
@@ -127,65 +128,81 @@
     function makeListenerForRule(rule) {
         console.log("makeListenerForRule", rule);
         var eventListener = function(evt) {
-            //console.log("eventListener", evt)
+            /**/console.log("eventListener", evt);
             var checkbox = gui.children[0];
-            if ((checkbox.checked || rule.force)
-                && (!rule.filter || evt.target.matches && evt.target.matches(rule.filter))) {
-                var json = JSON.stringify(rule.template);
-                json = json.replace(
-                    /"{([^}]+)}"/g,
-                    function(match) {
-                        var key = match.substr(2, match.length-4);
-                        if (key === 'tabId') {
-                            value = tabId;
-                        }
-                        else if (key === 'time') {
-                            value = new Date().getTime();
-                        }
-                        else if (key === 'url') {
-                            value = location.toString();
-                        }
-                        else if (key === 'selector') {
-                            value = getSelector(evt.target);
-                        }
-                        else if (key === 'label') {
-                            var target = evt.target;
-                            var labels = target.labels;
-                            if (labels && labels[0]) {
-                                value = labels[0].textContent;
-                            } else if (target.placeholder) {
-                                value = target.placeholder;
-                            } else if (target.tagName == 'SELECT') {
-                                value = target.children[0].textContent;
-                            } else if (target.tagName == 'INPUT' &&
-                                target.type.match(/submit|reset|button/)) {
-                                value = target.value;
-                            } else {
-                                value = target.textContent;
-                            }
-                        }
-                        else if (key[0] === '@') {
-                            var attr_chain = key.substr(1).split('.');
-                            var value = attr_chain.reduce(
-                                function (value, attr) {
-                                    return value[attr]
-                                }, evt);
-                            if (!value) value = null;
-                        }
-                        else {
-                            value = match;
-                        }
-                        return JSON.stringify(value);
-                    }
-                );
-                var obsel = JSON.parse(json);
-                if (obsel['@context'] === undefined
-                    && defaultContext !== undefined) {
-                    obsel['@context'] = defaultContext;
-                }
-                console.log("Sending obsel to worker", obsel);
-                port.postMessage(obsel);
+            if (!checkbox.checked && !rule.force) {
+                return;
             }
+            if (rule.filter &&
+                (!evt.target.matches || !evt.target.matches(rule.filter))) {
+                return;
+            }
+            if (rule.throttle) {
+                if (throttle[rule.event]) {
+                    /**/console.log("throttled");
+                    return;
+                } else {
+                    throttle[rule.event] = true;
+                    setTimeout(function() {
+                        throttle[rule.event] = false;
+                    }, rule.throttle);
+                }
+            }
+
+            var json = JSON.stringify(rule.template);
+            json = json.replace(
+                /"{([^}]+)}"/g,
+                function(match) {
+                    var key = match.substr(2, match.length - 4);
+                    if (key === 'tabId') {
+                        value = tabId;
+                    }
+                    else if (key === 'time') {
+                        value = new Date().getTime();
+                    }
+                    else if (key === 'url') {
+                        value = location.toString();
+                    }
+                    else if (key === 'selector') {
+                        value = getSelector(evt.target);
+                    }
+                    else if (key === 'label') {
+                        var target = evt.target;
+                        var labels = target.labels;
+                        if (labels && labels[0]) {
+                            value = labels[0].textContent;
+                        } else if (target.placeholder) {
+                            value = target.placeholder;
+                        } else if (target.tagName == 'SELECT') {
+                            value = target.children[0].textContent;
+                        } else if (target.tagName == 'INPUT' &&
+                            target.type.match(/submit|reset|button/)) {
+                            value = target.value;
+                        } else {
+                            value = target.textContent;
+                        }
+                    }
+                    else if (key[0] === '@') {
+                        var attr_chain = key.substr(1).split('.');
+                        var value = attr_chain.reduce(
+                            function (value, attr) {
+                                return value[attr]
+                            }, evt);
+                        if (!value) value = null;
+                    }
+                    else {
+                        value = match;
+                    }
+                    return JSON.stringify(value);
+                }
+            );
+            var obsel = JSON.parse(json);
+            if (obsel['@context'] === undefined
+                && defaultContext !== undefined) {
+                obsel['@context'] = defaultContext;
+            }
+            console.log("Sending obsel to worker", obsel);
+            port.postMessage(obsel);
         };
         var targets;
         if (rule.selector) {

@@ -24,7 +24,9 @@ A rule is an object with the following attributes:
 
 * ``event``: the event to listen to
 * ``filter``, ``selector``: the elements on which to listen to (see below for the difference)
-* ``template``: a template JSON object for the obsel to produce.
+* ``template``: a template JSON object for the obsel to produce
+* ``force``: a boolean indicating that the rule must apply even when tracing was disabled by the user
+* ``throttle``: a number indicating the minimum delay (in ms) between two applications of that rule
 
 In the template, strings of the form ``"{X}"`` will be substituted as follow:
 

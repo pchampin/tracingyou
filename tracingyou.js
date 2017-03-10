@@ -39,16 +39,24 @@
         link.type = 'text/css';
         head.appendChild(link);
 
-        gui = document.createElement("label");
+        gui = document.createElement("div");
         gui.id = "tracingyou-gui";
         gui.style.display = 'none';
+        var helpLink = document.createElement("a");
+        helpLink.textContent = "What is this?"
+        helpLink.target = '_blank';
+        gui.appendChild(helpLink);
         var checkbox = document.createElement("input");
         checkbox.type = "checkbox";
+        checkbox.id = "tracingyou-checkbox";
         checkbox.checked = !sessionStorage.getItem('tracingyou-disabled');
         checkbox.addEventListener('change', function() {
             sessionStorage.setItem('tracingyou-disabled', checkbox.checked?'':'disabled');
         });
         gui.appendChild(checkbox);
+        var label = document.createElement("label");
+        label.setAttribute('for', checkbox.id);
+        gui.appendChild(label)
         return gui;
     }
 
@@ -90,11 +98,8 @@
         if (evt.data.rules !== undefined) {
             // This is the first message from the worker.
             // add link to help
-            var help = document.createElement('a');
-            help.textContent = '?';
+            var help = gui.getElementsByTagName('a')[0];
             help.href = evt.data.helpUrl;
-            help.target = '_blank';
-            gui.appendChild(help);
             defaultContext = evt.data.defaultContext;
             rules = evt.data.rules || [];
             if (loaded) {
@@ -129,7 +134,7 @@
         console.log("makeListenerForRule", rule);
         var eventListener = function(evt) {
             /**/console.log("eventListener", evt);
-            var checkbox = gui.children[0];
+            var checkbox = gui.getElementsByTagName('input')[0];
             if (!checkbox.checked && !rule.force) {
                 return;
             }

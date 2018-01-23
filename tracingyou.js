@@ -12,8 +12,7 @@
     var rules; // set by workerHandlerMessage
 
     var port = connectToWorker();
-    port.postMessage(window.location.toString());
-    var gui = prepareGui();
+    var gui = null;
 
     var tabId = sessionStorage.getItem('tabId');
     if (!tabId) {
@@ -24,6 +23,8 @@
     var throttle = {};
 
     window.addEventListener('load', function() {
+	port.postMessage(window.location.toString());
+	gui = prepareGui();
         document.body.appendChild(gui);
         loaded = true;
     });

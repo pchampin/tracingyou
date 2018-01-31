@@ -47,6 +47,7 @@ function sendConfig(url) {
     }
     port.postMessage({
         helpUrl: helpUrl,
+        traceUri: config.traceUri,
         defaultContext: config.defaultContext,
         rules: rules
     });

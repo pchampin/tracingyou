@@ -14,6 +14,7 @@
     var port = connectToWorker();
     port.postMessage(window.location.toString());
     var helpUrl = null;
+    var traceUri = null;
     var gui = null;
 
     var tabId = sessionStorage.getItem('tabId');
@@ -61,7 +62,13 @@
         gui.appendChild(checkbox);
         var label = document.createElement("label");
         label.setAttribute('for', checkbox.id);
-        gui.appendChild(label)
+        gui.appendChild(label);
+        var iframe = document.createElement("iframe");
+        iframe.style.display = "none";
+        if (traceUri !== null) {
+          iframe.src = traceUri;
+        }
+        gui.appendChild(iframe);
         return gui;
     }
 
@@ -106,8 +113,11 @@
             if (gui !== null) {
               var help = gui.getElementsByTagName('a')[0];
               help.href = evt.data.helpUrl;
+              var iframe = gui.getElementsByTagName('iframe')[0];
+              iframe.src = evt.data.traceUri;
             } else {
               helpUrl = evt.data.helpUrl;
+              traceUri = evt.data.traceUri;
             }
             defaultContext = evt.data.defaultContext;
             rules = evt.data.rules || [];

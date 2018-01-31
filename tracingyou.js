@@ -12,6 +12,8 @@
     var rules; // set by workerHandlerMessage
 
     var port = connectToWorker();
+    port.postMessage(window.location.toString());
+    var helpUrl = null;
     var gui = null;
 
     var tabId = sessionStorage.getItem('tabId');
@@ -23,10 +25,9 @@
     var throttle = {};
 
     window.addEventListener('load', function() {
-	port.postMessage(window.location.toString());
-	gui = prepareGui();
-        document.body.appendChild(gui);
-        loaded = true;
+      gui = prepareGui();
+      document.body.appendChild(gui);
+      loaded = true;
     });
 
     /**
@@ -46,6 +47,9 @@
         var helpLink = document.createElement("a");
         helpLink.textContent = "What is this?"
         helpLink.target = '_blank';
+        if (helpUrl !== null) {
+          helpLink.href = helpUrl;
+        }
         gui.appendChild(helpLink);
         var checkbox = document.createElement("input");
         checkbox.type = "checkbox";
@@ -99,8 +103,12 @@
         if (evt.data.rules !== undefined) {
             // This is the first message from the worker.
             // add link to help
-            var help = gui.getElementsByTagName('a')[0];
-            help.href = evt.data.helpUrl;
+            if (gui !== null) {
+              var help = gui.getElementsByTagName('a')[0];
+              help.href = evt.data.helpUrl;
+            } else {
+              helpUrl = evt.data.helpUrl;
+            }
             defaultContext = evt.data.defaultContext;
             rules = evt.data.rules || [];
             if (loaded) {
@@ -265,4 +273,3 @@
     }
 
 }());
-

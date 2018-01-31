@@ -2,20 +2,20 @@
  * Created by pa on 06/04/16.
  */
 
+// jshint browser:true, devel:true
+
 (function() {
     "use strict";
+
+    var config; // set by worksrHandlerMessage
+    var rules; // set by workerHandlerMessage
+    var gui; // set by window.load
 
     var scriptUrl = new Error().stack.match(/(https?:\/\/.+):\d+:\d+/)[1];
     var PREVENT_SHARED_WORKER = false;
     var loaded = false;
-    var defaultContext = undefined;
-    var rules; // set by workerHandlerMessage
-
     var port = connectToWorker();
     port.postMessage(window.location.toString());
-    var helpUrl = null;
-    var traceUri = null;
-    var gui = null;
 
     var tabId = sessionStorage.getItem('tabId');
     if (!tabId) {
@@ -42,15 +42,12 @@
         link.type = 'text/css';
         head.appendChild(link);
 
-        gui = document.createElement("div");
+        var gui = document.createElement("div");
         gui.id = "tracingyou-gui";
         gui.style.display = 'none';
         var helpLink = document.createElement("a");
-        helpLink.textContent = "What is this?"
+        helpLink.textContent = "What is this?";
         helpLink.target = '_blank';
-        if (helpUrl !== null) {
-          helpLink.href = helpUrl;
-        }
         gui.appendChild(helpLink);
         var checkbox = document.createElement("input");
         checkbox.type = "checkbox";
@@ -65,9 +62,6 @@
         gui.appendChild(label);
         var iframe = document.createElement("iframe");
         iframe.style.display = "none";
-        if (traceUri !== null) {
-          iframe.src = traceUri;
-        }
         gui.appendChild(iframe);
         return gui;
     }
@@ -110,21 +104,20 @@
         if (evt.data.rules !== undefined) {
             // This is the first message from the worker.
             // add link to help
-            if (gui !== null) {
-              var help = gui.getElementsByTagName('a')[0];
-              help.href = evt.data.helpUrl;
-              var iframe = gui.getElementsByTagName('iframe')[0];
-              iframe.src = evt.data.traceUri;
-            } else {
-              helpUrl = evt.data.helpUrl;
-              traceUri = evt.data.traceUri;
-            }
-            defaultContext = evt.data.defaultContext;
+            config = evt.data;
             rules = evt.data.rules || [];
+            var finalizeGui = function () {
+              var help = gui.getElementsByTagName('a')[0];
+              help.href = config.helpUrl;
+              var iframe = gui.getElementsByTagName('iframe')[0];
+              iframe.src = config.traceUri;
+            };
             if (loaded) {
                 makeAllListenersForRules();
+                finalizeGui();
             } else {
-                window.addEventListener('load', makeAllListenersForRules)
+                window.addEventListener('load', makeAllListenersForRules);
+                window.addEventListener('load', finalizeGui);
             }
         } else {
             // This is a further message from the worker.
@@ -178,6 +171,7 @@
                 /"{([^}]+)}"/g,
                 function(match) {
                     var key = match.substr(2, match.length - 4);
+                    var value;
                     if (key === 'tabId') {
                         value = tabId;
                     }
@@ -197,9 +191,9 @@
                             value = labels[0].textContent;
                         } else if (target.placeholder) {
                             value = target.placeholder;
-                        } else if (target.tagName == 'SELECT') {
+                        } else if (target.tagName === 'SELECT') {
                             value = target.children[0].textContent;
-                        } else if (target.tagName == 'INPUT' &&
+                        } else if (target.tagName === 'INPUT' &&
                             target.type.match(/submit|reset|button/)) {
                             value = target.value;
                         } else {
@@ -208,9 +202,9 @@
                     }
                     else if (key[0] === '@') {
                         var attr_chain = key.substr(1).split('.');
-                        var value = attr_chain.reduce(
+                        value = attr_chain.reduce(
                             function (value, attr) {
-                                return value[attr]
+                                return value[attr];
                             }, evt);
                         if (!value) value = null;
                     }
@@ -221,9 +215,9 @@
                 }
             );
             var obsel = JSON.parse(json);
-            if (obsel['@context'] === undefined
-                && defaultContext !== undefined) {
-                obsel['@context'] = defaultContext;
+            if (obsel['@context'] === undefined &&
+                config.defaultContext !== undefined) {
+                obsel['@context'] = config.defaultContext;
             }
             console.log("Sending obsel to worker", obsel);
             port.postMessage(obsel);
@@ -259,13 +253,13 @@
         if (element.id) {
             selector = tagName.toLowerCase() + '#' + element.id;
         }
-        else if (tagName == "BODY" || tagName == "HEAD") {
+        else if (tagName === "BODY" || tagName === "HEAD") {
             selector = tagName.toLowerCase();
         }
         else {
             var sameTags = Array.prototype.filter.call(
                 element.parentNode.children,
-                function (e) { return e.tagName === tagName }
+                function (e) { return e.tagName === tagName; }
             );
             var rank = "";
             if (sameTags.length > 1) {

@@ -62,7 +62,8 @@
           "@type": "m:Scroll",
           "begin": "{time}",
           "m:tabId": "{tabId}",
-          "m:url": "{url}"
+          "m:url": "{url}",
+          "m:pageY": "{@pageY}"
         }
       },
 
